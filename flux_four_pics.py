@@ -105,7 +105,7 @@ def main():
     with col2:
         height = st.number_input("Height", min_value=128, max_value=1024, value=768, step=128)
     with col3:
-        num_outputs = st.number_input("Number of Images", min_value=1, max_value=4, value=4)
+        num_outputs = st.number_input("Number of Images", min_value=1, max_value=4, value=1)
 
     if st.button("Generate Images 🖼️"):
         if not prompt:
@@ -160,7 +160,7 @@ def main():
     st.markdown(
         """
         <div style='text-align: center'>
-        <p>Made with ❤️ using Flux AI and Streamlit</p>
+        <p>Made with ❤️ by René Salmon</p>
         </div>
         """,
         unsafe_allow_html=True
