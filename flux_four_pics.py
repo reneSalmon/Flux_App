@@ -72,7 +72,7 @@ def generate_images(prompt, width, height, num_images, model_params):
     return image_urls
 
 def main():
-    st.markdown("<h1 class='title'>🎨 Flux AI Image Generator</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='title'> Flux AI Image Generator 🎨</h1>", unsafe_allow_html=True)
 
     # Custom CSS
     st.markdown("""
@@ -86,11 +86,17 @@ def main():
             background-color: #FF6B6B;
         }
         .title {
-            text-align: center;
+            text-align: left;
             color: #FF4B4B;
         }
         </style>
         """, unsafe_allow_html=True)
+
+    prompt = st.text_area(
+        "Enter your prompt:",
+        height=100,
+        placeholder="Describe the image you want to generate..."
+    )
 
     # Input controls
     col1, col2, col3 = st.columns(3)
@@ -101,19 +107,13 @@ def main():
     with col3:
         num_outputs = st.number_input("Number of Images", min_value=1, max_value=4, value=4)
 
-    prompt = st.text_area(
-        "Enter your prompt:",
-        height=100,
-        placeholder="Describe the image you want to generate..."
-    )
-
-    if st.button("🎨 Generate Images"):
+    if st.button("Generate Images 🖼️"):
         if not prompt:
             st.error("Please enter a prompt first!")
             return
 
         try:
-            with st.spinner('🎨 Creating your masterpieces...'):
+            with st.spinner('Creating your masterpieces...'):
                 start_time = time.time()
 
                 # Generate images with user-specified parameters
