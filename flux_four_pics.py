@@ -4,10 +4,10 @@ import time
 from io import BytesIO
 from PIL import Image
 import os
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+#load_dotenv()
 
 # Print all environment variables
 print(dict(os.environ))
