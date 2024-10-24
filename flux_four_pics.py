@@ -5,12 +5,6 @@ from io import BytesIO
 from PIL import Image
 import os
 from dotenv import load_dotenv
-import pkg_resources
-installed_packages = pkg_resources.working_set
-for package in installed_packages:
-    if package.key == 'python-dotenv':
-        print(f"python-dotenv version: {package.version}")
-
 
 # Test the installation
 print("dotenv installed successfully")
