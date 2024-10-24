@@ -9,6 +9,12 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Print all environment variables
+print(dict(os.environ))
+
+# Print specific API key
+print("FLUX_API_KEY:", os.getenv('FLUX_API_KEY'))
+
 # Get API key from environment variable
 API_KEY = os.getenv("FLUX_API_KEY")
 if not API_KEY:
