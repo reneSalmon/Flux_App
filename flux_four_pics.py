@@ -3,34 +3,9 @@ import requests
 import time
 from io import BytesIO
 from PIL import Image
-import os
-from dotenv import load_dotenv
 
-# Test the installation
-print("dotenv installed successfully")
-
-# Load environment variables
-load_dotenv()
-
-# Print all environment variables
-print(dict(os.environ))
-
-# Print specific API key
-print("FLUX_API_KEY:", os.getenv('FLUX_API_KEY'))
-
-# Get API key from environment variable
-API_KEY = os.getenv("FLUX_API_KEY")
-if not API_KEY:
-    st.error("API key not found. Please set the FLUX_API_KEY environment variable.")
-    st.stop()
-
-
-# Page configuration
-st.set_page_config(
-    page_title="Flux AI Image Generator",
-    page_icon="🎨",
-    layout="wide"
-)
+# Get API key from Streamlit secrets
+API_KEY = st.secrets["FLUX_API_KEY"]
 
 def generate_images(prompt, width, height, num_images, model_params):
     image_urls = []  # List to store image URLs
@@ -46,7 +21,7 @@ def generate_images(prompt, width, height, num_images, model_params):
             'https://api.bfl.ml/v1/flux-pro-1.1',
             headers={
                 'accept': 'application/json',
-                'x-key': API_KEY,
+                'x-key': API_KEY,  # Using secret API key
                 'Content-Type': 'application/json',
             },
             json={
@@ -54,7 +29,7 @@ def generate_images(prompt, width, height, num_images, model_params):
                 'width': width,
                 'height': height,
                 'num_outputs': 1,
-                **model_params  # Include all model parameters
+                **model_params
             },
         ).json()
 
@@ -71,7 +46,7 @@ def generate_images(prompt, width, height, num_images, model_params):
                 'https://api.bfl.ml/v1/get_result',
                 headers={
                     'accept': 'application/json',
-                    'x-key': API_KEY,
+                    'x-key': API_KEY,  # Using secret API key
                 },
                 params={
                     'id': request_id,
@@ -97,7 +72,7 @@ def generate_images(prompt, width, height, num_images, model_params):
     return image_urls
 
 def main():
-    st.markdown("<h1 class='title'>Flux - AI Image Generator 🎨</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='title'>🎨 Flux AI Image Generator</h1>", unsafe_allow_html=True)
 
     # Custom CSS
     st.markdown("""
@@ -111,68 +86,26 @@ def main():
             background-color: #FF6B6B;
         }
         .title {
-            text-align: left;
+            text-align: center;
             color: #FF4B4B;
         }
         </style>
         """, unsafe_allow_html=True)
 
-    # Sidebar for model parameters
-    with st.sidebar:
-        st.header("Model Parameters")
-        show_advanced = st.checkbox("Show Advanced Settings", False)
-
-        if show_advanced:
-            st.subheader("Generation Settings")
-            guidance_scale = st.slider("Guidance Scale", 1.0, 20.0, 7.5, 0.5,
-                                     help="Higher values make the output more closely match the prompt but may reduce quality")
-
-            inference_steps = st.slider("Inference Steps", 20, 100, 50, 5,
-                                      help="More steps generally create better images but take longer")
-
-            st.subheader("Sampling Settings")
-            scheduler = st.selectbox("Scheduler",
-                                   ["DPM++ 2M Karras", "DPM++ 2M", "Euler", "Euler A"],
-                                   help="Different schedulers produce different results")
-
-            seed = st.number_input("Seed", -1, 2147483647, -1,
-                                 help="Set a specific seed for reproducible results. -1 for random")
-
-            st.subheader("Image Settings")
-            negative_prompt = st.text_area("Negative Prompt", "",
-                                         help="Specify what you don't want in the image")
-
-            safety_checker = st.checkbox("Enable Safety Checker", True,
-                                       help="Filter out NSFW content")
-
-            model_params = {
-                "guidance_scale": guidance_scale,
-                "num_inference_steps": inference_steps,
-                "scheduler": scheduler,
-                "seed": seed if seed != -1 else None,
-                "negative_prompt": negative_prompt if negative_prompt else None,
-                "safety_checker": safety_checker
-            }
-        else:
-            model_params = {}  # Use defaults if advanced settings are hidden
-
-
-    prompt = st.text_area(
-        "Enter your prompt:",
-        height=100,
-        placeholder="Describe the image you want to generate..."
-    )
-
-
-# Main content
+    # Input controls
     col1, col2, col3 = st.columns(3)
     with col1:
         width = st.number_input("Width", min_value=128, max_value=1024, value=1024, step=128)
     with col2:
         height = st.number_input("Height", min_value=128, max_value=1024, value=768, step=128)
     with col3:
-        num_outputs = st.number_input("Number of Images", min_value=1, max_value=4, value=1)
+        num_outputs = st.number_input("Number of Images", min_value=1, max_value=4, value=4)
 
+    prompt = st.text_area(
+        "Enter your prompt:",
+        height=100,
+        placeholder="Describe the image you want to generate..."
+    )
 
     if st.button("🎨 Generate Images"):
         if not prompt:
@@ -183,8 +116,8 @@ def main():
             with st.spinner('🎨 Creating your masterpieces...'):
                 start_time = time.time()
 
-                # Generate images with all parameters
-                image_urls = generate_images(prompt, width, height, num_outputs, model_params)
+                # Generate images with user-specified parameters
+                image_urls = generate_images(prompt, width, height, num_outputs, {})
 
                 if image_urls:
                     st.success("✨ Images generated successfully!")
@@ -199,7 +132,7 @@ def main():
                             url,
                             headers={
                                 'accept': 'application/json',
-                                'x-key': API_KEY,
+                                'x-key': API_KEY,  # Using secret API key
                             }
                         )
 
@@ -227,7 +160,7 @@ def main():
     st.markdown(
         """
         <div style='text-align: center'>
-        <p>Made with ❤️ by René Salmon</p>
+        <p>Made with ❤️ using Flux AI and Streamlit</p>
         </div>
         """,
         unsafe_allow_html=True
