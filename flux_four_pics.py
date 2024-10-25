@@ -202,7 +202,7 @@ def main():
 
     # Add preset selector before the seed input
     seed_preset = st.selectbox(
-        "Ziel der Bildes",
+        "Ziel des Bildes",
         options=list(preset_seeds.keys()),
         help="Wählen Sie einen vordefinierten Modus für Ihre Marketingziele"
         )
@@ -362,44 +362,89 @@ def main():
             """, unsafe_allow_html=True)
 
         # Add parameter descriptions directly without nested expander
+        # Add this markdown section after the seed_preset selectbox or in the expander section
         st.markdown("""
             <div style="color: #ffffff; background-color: #424242; padding: 15px; border-radius: 4px; border: 1px solid #616161;">
-            <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Workflow-Voreinstellungen</h4>
+            <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Ziele des Bildes - Voreinstellungen</h4>
 
             <p style="color: #bdbdbd;">
-            <strong style="color: #ffffff;">Schnellkonzept:</strong>
-            Ideal für erste Entwürfe und Ideenfindung
-            - Niedrige Markentreue
-            - Schnellvorschau
-            - 20 Verfeinerungsschritte
+                <strong style="color: #ffffff;">Kreativ-Exploration: Brainstorming & Ideation</strong><br>
+                • Maximale kreative Freiheit für neue Ideen
+                • Zufällige Ergebnisse für Inspiration
+                • Ideal für: Konzeptfindung, Moodboards, erste Entwürfe
+                • Technisch: Zufälliger Seed (-1), niedrige Markentreue
             </p>
 
             <p style="color: #bdbdbd;">
-            <strong style="color: #ffffff;">Reproduzierbarkeit:</strong>
-            Ein Werkzeug für konsistente Kampagnen. Verwenden Sie den gleichen Wert, um identische Bilder zu generieren - ideal für:
-            • A/B-Testing von Werbekampagnen
-            • Konsistente Markenbildsprache
-            • Iterative Designprozesse
+                <strong style="color: #ffffff;">Kampagnen-Erstellung: Ein Konzept, Multiple Varianten</strong><br>
+                • Konsistente Basis mit kontrollierten Variationen
+                • Reproduzierbare Ergebnisse für A/B-Tests
+                • Ideal für: Kampagnen-Rollout, Content-Serien, Social Media
+                • Technisch: Fester Seed (12345), mittlere Markentreue
             </p>
 
             <p style="color: #bdbdbd;">
-            <strong style="color: #ffffff;">Produktionsstandard:</strong>
-            Ausgewogene Einstellungen für die tägliche Produktion
-            - Mittlere Markentreue
-            - Standard-Produktion
-            - 30 Verfeinerungsschritte
+                <strong style="color: #ffffff;">Konsistente Marken-Bilderwelt: Striktes Folgen der Guidelines</strong><br>
+                • Maximale Kontrolle über visuelle Identität
+                • Präzise Einhaltung von Markenrichtlinien
+                • Ideal für: Kundenaufträge, Corporate Design, Markenkommunikation
+                • Technisch: Fester Seed (67890), hohe Markentreue
             </p>
 
-             <p style="color: #bdbdbd;">
-            <strong style="color: #ffffff;">Kundenpräsentation:</strong>
-            Höchste Qualität für finale Präsentationen
-            - Hohe Markentreue
-            - Premium-Qualität
-            - 40+ Verfeinerungsschritte
+            <p style="color: #bdbdbd; margin-top: 15px;">
+                <strong style="color: #ffffff;">Anwendung:</strong><br>
+                Wählen Sie die Voreinstellung entsprechend Ihres Projektziels. Die Parameter werden automatisch optimiert für:
+                • Kreativität vs. Kontrolle
+                • Variation vs. Konsistenz
+                • Experimentell vs. Markentreu
             </p>
             </div>
-            """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
+        st.markdown("""
+            <div style="color: #ffffff; background-color: #424242; padding: 15px; border-radius: 4px; border: 1px solid #616161;">
+            <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Workflow-Optionen</h4>
+
+            <p style="color: #bdbdbd;">
+                <strong style="color: #ffffff;">Gestaltungsfreiheit:</strong>
+                Steuert die Balance zwischen kreativer Freiheit und Prompt-Treue. Höhere Werte erzeugen Bilder, die enger an Ihrer Beschreibung bleiben, können aber weniger kreativ wirken.
+            </p>
+
+            <p style="color: #bdbdbd;">
+                <strong style="color: #ffffff;">Bildwiedergabe-Modi:</strong>
+                Verschiedene Algorithmen für unterschiedliche Anwendungsfälle:
+            </p>
+            <ul style="margin-left: 20px; color: #bdbdbd;">
+                <li><strong style="color: #ffffff;">Premium-Qualität:</strong> Beste Gesamtqualität für finale Präsentationen</li>
+                <li><strong style="color: #ffffff;">Standard-Produktion:</strong> Ausgewogenes Verhältnis zwischen Geschwindigkeit und Qualität</li>
+                <li><strong style="color: #ffffff;">Schnellvorschau:</strong> Schnelle Generierung für Konzeptphase</li>
+                <li><strong style="color: #ffffff;">Kreativ-Exploration:</strong> Maximale kreative Interpretation</li>
+            </ul>
+            </p>
+            <p style="color: #bdbdbd;">
+                <strong style="color: #ffffff;">Detailgenauigkeit:</strong>
+                Bestimmt die Feinheit der Ausarbeitung. Mehr Details bedeuten bessere Qualität, aber längere Generierungszeit:
+                • Entwurf (20): Schnelle Konzeptvisualisierung
+                • Standard (30): Ausgewogene Produktionsqualität
+                • Premium (50+): Maximale Detailtiefe
+            </p>
+
+            <p style="color: #bdbdbd;">
+                <strong style="color: #ffffff;">Workflow-Voreinstellungen:</strong>
+                Optimierte Einstellungskombinationen für verschiedene Anwendungsfälle:
+            </p>
+            <ul style="margin-left: 20px; color: #bdbdbd;">
+                <li><strong style="color: #ffffff;">Kreativ-Exploration:</strong> Maximale Freiheit für Ideenfindung und Brainstorming</li>
+                <li><strong style="color: #ffffff;">Kampagnen-Erstellung:</strong> Ideal für konsistente Variationen eines Konzepts</li>
+                <li><strong style="color: #ffffff;">Marken-Bilderwelt:</strong> Strikte Einhaltung von Markenrichtlinien</li>
+            </ul>
+            </p>
+            <p style="color: #bdbdbd;">
+                <strong style="color: #ffffff;">Ausschlusskriterien:</strong>
+                Definition unerwünschter Elemente zur Wahrung der Markensicherheit und CI-Konformität.
+            </p>
+            </div>
+        """, unsafe_allow_html=True)
 
     st.markdown(
         """
