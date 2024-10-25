@@ -294,63 +294,63 @@ def main():
             </style>
             """, unsafe_allow_html=True)
 
-        col_tune1, col_tune2 = st.columns(2)
+        #col_tune1, col_tune2 = st.columns(2)
 
-        with col_tune1:
-            scheduler = st.selectbox(
-                        "Bildwiedergabe Optionen",
-                        options=["Premium-Qualität (DPM++ 2M Karras)",
-                        "Standard-Produktion (DPM++ 2M)",
-                        "Schnellvorschau (Euler)",
-                        "Kreativ-Exploration (Euler A)"],
-                        index=0,
-                        help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows"
-                    )
+        #with col_tune1:
+        scheduler = st.selectbox(
+                    "Bildwiedergabe Optionen",
+                    options=["Premium-Qualität (DPM++ 2M Karras)",
+                    "Standard-Produktion (DPM++ 2M)",
+                    "Schnellvorschau (Euler)",
+                    "Kreativ-Exploration (Euler A)"],
+                    index=0,
+                    help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows"
+                )
 
-            guidance_scale = st.slider(
-                "Gestaltungsfreiheit",
-                min_value=1.0,
-                max_value=20.0,
-                value=7.5,
-                step=0.5,
-                help="Niedrig: Maximale kreative Freiheit | Hoch: Strikte Markentreue"
-            )
+        guidance_scale = st.slider(
+            "Gestaltungsfreiheit",
+            min_value=1.0,
+            max_value=20.0,
+            value=7.5,
+            step=0.5,
+            help="Niedrig: Maximale kreative Freiheit | Hoch: Strikte Markentreue"
+        )
 
-            num_inference_steps = st.slider(
-                "Detailgenauigkeit",
-                min_value=20,
-                max_value=100,
-                value=50,
-                step=5,
-                help="Niedrig: Schnelle Vorschau (20) | Standard: Produktionsqualität (30) | Premium: Maximale Details (50+)"
-            )
+        num_inference_steps = st.slider(
+            "Detailgenauigkeit",
+            min_value=20,
+            max_value=100,
+            value=50,
+            step=5,
+            help="Niedrig: Schnelle Vorschau (20) | Standard: Produktionsqualität (30) | Premium: Maximale Details (50+)"
+        )
 
 
-            # Update seed value based on preset
-            if seed_preset:
-                preset_seed = preset_seeds[seed_preset]
-            else:
-                preset_seed = -1
+        # Update seed value based on preset
+        if seed_preset:
+            preset_seed = preset_seeds[seed_preset]
+        else:
+            preset_seed = -1
 
-            # Modified seed input to use preset value
-            seed = st.number_input(
-                "Reproduzierbarkeit",
-                min_value=-1,
-                max_value=2147483647,
-                value=preset_seed,
-                help="Setzen Sie einen spezifischen Wert für wiederholbare Ergebnisse. -1 für zufällige Generierung"
-            )
-            safety_checker = st.checkbox(
-                "Sicherheits-Filter aktiv",
-                value=True,
-                help="Filter out NSFW content"
-            )
-        with col_tune2:
-            negative_prompt = st.text_area(
-                "Ausschlusskriterien",
-                placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
-                help="Markensicherheit & Ausschlüsse",
-                height=200
+        # Modified seed input to use preset value
+        seed = st.number_input(
+            "Reproduzierbarkeit",
+            min_value=-1,
+            max_value=2147483647,
+            value=preset_seed,
+            help="Setzen Sie einen spezifischen Wert für wiederholbare Ergebnisse. -1 für zufällige Generierung"
+        )
+        safety_checker = st.checkbox(
+            "Sicherheits-Filter aktiv",
+            value=True,
+            help="Filter out NSFW content"
+        )
+    #with col_tune2:
+        negative_prompt = st.text_area(
+            "Ausschlusskriterien",
+            placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
+            help="Markensicherheit & Ausschlüsse",
+            height=150
             )
         # Add separator with material design style
         st.markdown("""
