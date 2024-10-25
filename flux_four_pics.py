@@ -350,7 +350,7 @@ def main():
                     "Ausschlusskriterien",
                     placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
                     help="Markensicherheit & Ausschlüsse",
-                    height=500
+                    height=300
                 )
         # Add separator with material design style
         st.markdown("""
