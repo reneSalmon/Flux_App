@@ -306,29 +306,47 @@ def main():
             )
 
             seed = st.number_input(
-                "Seed",
+                "Reproduzierbarkeit",
                 min_value=-1,
                 max_value=2147483647,
                 value=-1,
-                help="Set a specific seed for reproducible results. -1 for random"
+                help="Setzen Sie einen spezifischen Wert für wiederholbare Ergebnisse. -1 steht für zufällige Generierung"
             )
 
             safety_checker = st.checkbox(
-                "Enable Safety Filter",
+                "Aktive Sicherheits-Filter",
                 value=True,
                 help="Filter out NSFW content"
             )
 
-        with col_tune2:
-            st.markdown('<p class="parameter-title"></p>', unsafe_allow_html=True)
+                        # Add a preset function for common marketing scenarios
+            preset_seeds = {
+                "Kampagnen-Modus": 12345,
+                "Marken-Konsistenz": 67890,
+                "Kreativ-Exploration": -1
+            }
 
-            negative_prompt = st.text_area(
-                "Ausschlusskriterien",
-                placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
-                help="Markensicherheit & Ausschlüsse",
-                height=400
-
+            # Add preset selector in the advanced settings
+            seed_preset = st.selectbox(
+                "Voreinstellungen",
+                options=list(preset_seeds.keys()),
+                help="Wählen Sie einen vordefinierten Modus für Ihre Marketingziele"
             )
+
+            # Update seed value based on preset
+            if seed_preset:
+                seed = preset_seeds[seed_preset]
+
+                    with col_tune2:
+                        st.markdown('<p class="parameter-title"></p>', unsafe_allow_html=True)
+
+                        negative_prompt = st.text_area(
+                            "Ausschlusskriterien",
+                            placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
+                            help="Markensicherheit & Ausschlüsse",
+                            height=400
+
+                        )
 
 
 
@@ -352,6 +370,14 @@ def main():
             - Niedrige Markentreue
             - Schnellvorschau
             - 20 Verfeinerungsschritte
+        </p>
+
+        <p style="color: #bdbdbd;">
+    <strong style="color: #ffffff;">Reproduzierbarkeit:</strong>
+    Ein Werkzeug für konsistente Kampagnen. Verwenden Sie den gleichen Wert, um identische Bilder zu generieren - ideal für:
+            • A/B-Testing von Werbekampagnen
+            • Konsistente Markenbildsprache
+            • Iterative Designprozesse
         </p>
 
         <p style="color: #bdbdbd;">
