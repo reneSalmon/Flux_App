@@ -197,7 +197,7 @@ def main():
     prompt = st.text_area(
         "Bildkonzept:",
         height=200,
-        placeholder="Beschreibe deine Bild..."
+        placeholder="Beschreibe dein Bild..."
     )
 
     # Add preset selector before the seed input
@@ -349,7 +349,7 @@ def main():
                     "Ausschlusskriterien",
                     placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
                     help="Markensicherheit & Ausschlüsse",
-                    height=450
+                    height=500
                 )
         # Add separator with material design style
         st.markdown("""
