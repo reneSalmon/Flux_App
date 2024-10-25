@@ -72,6 +72,16 @@ def generate_images(prompt, width, height, num_images, model_params):
     return image_urls
 
 def main():
+
+
+    # Add the seed presets dictionary right before the seed input
+    preset_seeds = {
+        "Kreativ-Exploration: Brainstorming & Ideation": -1,
+        "Kampagnen-Erstellung: Ein Konzept, Multiple Varianten": 12345,
+        "Konsistente Marken-Bilderwelt: Stricktes folgen der Guidelines": 67890
+
+    }
+
     st.markdown("<h1 class='title'>AI Image Generator | Flux 1.1 Pro </h1>", unsafe_allow_html=True)
 
    # Custom CSS with Material Design grey and black theme
@@ -125,7 +135,7 @@ def main():
         }
 
         .stSelectbox>div>div {
-            background-color: #424242;
+            background-color: transparent;
             color: #ffffff;
             border: 1px solid #616161;
         }
@@ -182,20 +192,35 @@ def main():
         </style>
     """, unsafe_allow_html=True)
 
+    # Add preset selector before the seed input
+    seed_preset = st.selectbox(
+        "Ziel der Bildes",
+        options=list(preset_seeds.keys()),
+        help="Wählen Sie einen vordefinierten Modus für Ihre Marketingziele"
+        )
+
     prompt = st.text_area(
         "Bildkonzept:",
         height=200,
-        placeholder="Beschreibe deine Bildidee..."
+        placeholder="Beschreibe deine Bild..."
     )
 
     # Input controls (make sure this is at the same indentation level as other main content)
-    col1, col2, col3 = st.columns(3)
+    col1, col2= st.columns(2)
     with col1:
-        width = st.number_input("Breite", min_value=128, max_value=1024, value=1024, step=128)
+        scheduler = st.selectbox(
+                        "Bildwiedergabe Optionen",
+                        options=["Premium-Qualität (DPM++ 2M Karras)",
+                        "Standard-Produktion (DPM++ 2M)",
+                        "Schnellvorschau (Euler)",
+                        "Kreativ-Exploration (Euler A)"],
+                        index=0,
+                        help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows"
+                    )
+
     with col2:
-        height = st.number_input("Höhe", min_value=128, max_value=1024, value=768, step=128)
-    with col3:
         num_outputs = st.number_input("Anzahl Varianten", min_value=1, max_value=4, value=1)
+
 
     if st.button("✨Bild generieren✨"):
         if not prompt:
@@ -277,8 +302,12 @@ def main():
         with col_tune1:
             st.markdown('<p class="parameter-title"></p>', unsafe_allow_html=True)
 
+            width = st.number_input("Breite", min_value=128, max_value=1024, value=1024, step=128)
+
+            height = st.number_input("Höhe", min_value=128, max_value=1024, value=768, step=128)
+
             guidance_scale = st.slider(
-                "Markentreue",
+                "Gestaltungsfreiheit",
                 min_value=1.0,
                 max_value=20.0,
                 value=7.5,
@@ -287,37 +316,14 @@ def main():
             )
 
             num_inference_steps = st.slider(
-                "Verfeinerungsgrad",
+                "Detailgenauigkeit",
                 min_value=20,
                 max_value=100,
                 value=50,
                 step=5,
-                help="Entwurf (20) | Standard (30) | Premium (50+)"
+                help="Niedrig: Schnelle Vorschau (20) | Standard: Produktionsqualität (30) | Premium: Maximale Details (50+)"
             )
 
-            scheduler = st.selectbox(
-                "Rendering-Qualität",
-                options=["Premium-Qualität",
-                "Standard-Produktion",
-                "Schnellvorschau",
-                "Kreativ-Exploration"],
-                index=0,
-                help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows"
-            )
-
-            # Add preset selector before the seed input
-            seed_preset = st.selectbox(
-                "Voreinstellungen",
-                options=list(preset_seeds.keys()),
-                help="Wählen Sie einen vordefinierten Modus für Ihre Marketingziele"
-            )
-
-            # Add the seed presets dictionary right before the seed input
-            preset_seeds = {
-                "Kampagnen-Modus": 12345,
-                "Marken-Konsistenz": 67890,
-                "Kreativ-Exploration": -1
-            }
 
             # Update seed value based on preset
             if seed_preset:
@@ -334,11 +340,17 @@ def main():
                 help="Setzen Sie einen spezifischen Wert für wiederholbare Ergebnisse. -1 für zufällige Generierung"
             )
             safety_checker = st.checkbox(
-                "Aktive Sicherheits-Filter",
+                "Sicherheits-Filter aktiv",
                 value=True,
                 help="Filter out NSFW content"
             )
-
+        with col_tune2:
+                negative_prompt = st.text_area(
+                    "Ausschlusskriterien",
+                    placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
+                    help="Markensicherheit & Ausschlüsse",
+                    height=400
+                )
         # Add separator with material design style
         st.markdown("""
             <div style="
@@ -350,42 +362,42 @@ def main():
 
         # Add parameter descriptions directly without nested expander
         st.markdown("""
-             <div style="color: #ffffff; background-color: #424242; padding: 15px; border-radius: 4px; border: 1px solid #616161;">
-        <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Workflow-Voreinstellungen</h4>
+            <div style="color: #ffffff; background-color: #424242; padding: 15px; border-radius: 4px; border: 1px solid #616161;">
+            <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Workflow-Voreinstellungen</h4>
 
-        <p style="color: #bdbdbd;">
+            <p style="color: #bdbdbd;">
             <strong style="color: #ffffff;">Schnellkonzept:</strong>
             Ideal für erste Entwürfe und Ideenfindung
             - Niedrige Markentreue
             - Schnellvorschau
             - 20 Verfeinerungsschritte
-        </p>
+            </p>
 
-        <p style="color: #bdbdbd;">
-    <strong style="color: #ffffff;">Reproduzierbarkeit:</strong>
-    Ein Werkzeug für konsistente Kampagnen. Verwenden Sie den gleichen Wert, um identische Bilder zu generieren - ideal für:
+            <p style="color: #bdbdbd;">
+            <strong style="color: #ffffff;">Reproduzierbarkeit:</strong>
+            Ein Werkzeug für konsistente Kampagnen. Verwenden Sie den gleichen Wert, um identische Bilder zu generieren - ideal für:
             • A/B-Testing von Werbekampagnen
             • Konsistente Markenbildsprache
             • Iterative Designprozesse
-        </p>
+            </p>
 
-        <p style="color: #bdbdbd;">
+            <p style="color: #bdbdbd;">
             <strong style="color: #ffffff;">Produktionsstandard:</strong>
             Ausgewogene Einstellungen für die tägliche Produktion
             - Mittlere Markentreue
             - Standard-Produktion
             - 30 Verfeinerungsschritte
-        </p>
+            </p>
 
-        <p style="color: #bdbdbd;">
+             <p style="color: #bdbdbd;">
             <strong style="color: #ffffff;">Kundenpräsentation:</strong>
             Höchste Qualität für finale Präsentationen
             - Hohe Markentreue
             - Premium-Qualität
             - 40+ Verfeinerungsschritte
-        </p>
-        </div>
-        """, unsafe_allow_html=True)
+            </p>
+            </div>
+            """, unsafe_allow_html=True)
 
 
     st.markdown(
