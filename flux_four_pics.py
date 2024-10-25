@@ -305,50 +305,39 @@ def main():
                 help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows"
             )
 
-            seed = st.number_input(
-                "Reproduzierbarkeit",
-                min_value=-1,
-                max_value=2147483647,
-                value=-1,
-                help="Setzen Sie einen spezifischen Wert für wiederholbare Ergebnisse. -1 steht für zufällige Generierung"
-            )
-
-            safety_checker = st.checkbox(
-                "Aktive Sicherheits-Filter",
-                value=True,
-                help="Filter out NSFW content"
-            )
-
-                        # Add a preset function for common marketing scenarios
-            preset_seeds = {
-                "Kampagnen-Modus": 12345,
-                "Marken-Konsistenz": 67890,
-                "Kreativ-Exploration": -1
-            }
-
-            # Add preset selector in the advanced settings
+            # Add preset selector before the seed input
             seed_preset = st.selectbox(
                 "Voreinstellungen",
                 options=list(preset_seeds.keys()),
                 help="Wählen Sie einen vordefinierten Modus für Ihre Marketingziele"
             )
 
+            # Add the seed presets dictionary right before the seed input
+            preset_seeds = {
+                "Kampagnen-Modus": 12345,
+                "Marken-Konsistenz": 67890,
+                "Kreativ-Exploration": -1
+            }
+
             # Update seed value based on preset
             if seed_preset:
-                seed = preset_seeds[seed_preset]
+                preset_seed = preset_seeds[seed_preset]
+            else:
+                preset_seed = -1
 
-                    with col_tune2:
-                        st.markdown('<p class="parameter-title"></p>', unsafe_allow_html=True)
-
-                        negative_prompt = st.text_area(
-                            "Ausschlusskriterien",
-                            placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
-                            help="Markensicherheit & Ausschlüsse",
-                            height=400
-
-                        )
-
-
+            # Modified seed input to use preset value
+            seed = st.number_input(
+                "Reproduzierbarkeit",
+                min_value=-1,
+                max_value=2147483647,
+                value=preset_seed,
+                help="Setzen Sie einen spezifischen Wert für wiederholbare Ergebnisse. -1 für zufällige Generierung"
+            )
+            safety_checker = st.checkbox(
+                "Aktive Sicherheits-Filter",
+                value=True,
+                help="Filter out NSFW content"
+            )
 
         # Add separator with material design style
         st.markdown("""
