@@ -276,7 +276,7 @@ def main():
     st.markdown("---")
 
     #st.markdown("### 🛠️ Fine-tune Model Like a Pro")
-    with st.expander("Profil-Einstellungen", expanded=False):
+    with st.expander("Details einstellen", expanded=False):
         # Add a container with custom styling
         st.markdown("""
             <style>
