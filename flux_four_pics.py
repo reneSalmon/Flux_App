@@ -302,8 +302,6 @@ def main():
         col_tune1, col_tune2 = st.columns(2)
 
         with col_tune1:
-            st.markdown('<p class="parameter-title"></p>', unsafe_allow_html=True)
-
             width = st.number_input("Breite", min_value=128, max_value=1024, value=1024, step=128)
 
             height = st.number_input("Höhe", min_value=128, max_value=1024, value=768, step=128)
@@ -351,7 +349,7 @@ def main():
                     "Ausschlusskriterien",
                     placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
                     help="Markensicherheit & Ausschlüsse",
-                    height=400
+                    height=450
                 )
         # Add separator with material design style
         st.markdown("""
