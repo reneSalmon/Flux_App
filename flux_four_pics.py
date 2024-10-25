@@ -346,12 +346,12 @@ def main():
                 help="Filter out NSFW content"
             )
         with col_tune2:
-                negative_prompt = st.text_area(
-                    "Ausschlusskriterien",
-                    placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
-                    help="Markensicherheit & Ausschlüsse",
-                    height=300
-                )
+            negative_prompt = st.text_area(
+                "Ausschlusskriterien",
+                placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
+                help="Markensicherheit & Ausschlüsse",
+                height=200
+            )
         # Add separator with material design style
         st.markdown("""
             <div style="
