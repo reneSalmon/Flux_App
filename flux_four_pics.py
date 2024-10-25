@@ -192,18 +192,20 @@ def main():
         </style>
     """, unsafe_allow_html=True)
 
-    # Add preset selector before the seed input
-    seed_preset = st.selectbox(
-        "Ziel der Bildes",
-        options=list(preset_seeds.keys()),
-        help="Wählen Sie einen vordefinierten Modus für Ihre Marketingziele"
-        )
+
 
     prompt = st.text_area(
         "Bildkonzept:",
         height=200,
         placeholder="Beschreibe deine Bild..."
     )
+
+    # Add preset selector before the seed input
+    seed_preset = st.selectbox(
+        "Ziel der Bildes",
+        options=list(preset_seeds.keys()),
+        help="Wählen Sie einen vordefinierten Modus für Ihre Marketingziele"
+        )
 
     # Input controls (make sure this is at the same indentation level as other main content)
     col1, col2= st.columns(2)
