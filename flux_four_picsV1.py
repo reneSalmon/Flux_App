@@ -183,21 +183,21 @@ def main():
     """, unsafe_allow_html=True)
 
     prompt = st.text_area(
-        "Bildkonzept:",
-        height=200,
-        placeholder="Beschreibe deine Bildidee..."
+        "Enter your prompt:",
+        height=150,
+        placeholder="Describe the image you want to generate..."
     )
 
     # Input controls (make sure this is at the same indentation level as other main content)
     col1, col2, col3 = st.columns(3)
     with col1:
-        width = st.number_input("Breite", min_value=128, max_value=1024, value=1024, step=128)
+        width = st.number_input("Width", min_value=128, max_value=1024, value=1024, step=128)
     with col2:
-        height = st.number_input("Höhe", min_value=128, max_value=1024, value=768, step=128)
+        height = st.number_input("Height", min_value=128, max_value=1024, value=768, step=128)
     with col3:
-        num_outputs = st.number_input("Anzahl Varianten", min_value=1, max_value=4, value=1)
+        num_outputs = st.number_input("Number of Images", min_value=1, max_value=4, value=1)
 
-    if st.button("✨Bild generieren✨"):
+    if st.button("✨Generate Images✨"):
         if not prompt:
             st.error("Please enter a prompt first!")
             return
@@ -249,7 +249,7 @@ def main():
     st.markdown("---")
 
     #st.markdown("### 🛠️ Fine-tune Model Like a Pro")
-    with st.expander("Profil-Einstellungen", expanded=False):
+    with st.expander("Advanced Settings", expanded=False):
         # Add a container with custom styling
         st.markdown("""
             <style>
@@ -278,31 +278,28 @@ def main():
             st.markdown('<p class="parameter-title"></p>', unsafe_allow_html=True)
 
             guidance_scale = st.slider(
-                "Markentreue",
+                "Guidance Scale",
                 min_value=1.0,
                 max_value=20.0,
                 value=7.5,
                 step=0.5,
-                help="Niedrig: Maximale kreative Freiheit | Hoch: Strikte Markentreue"
+                help="Higher values = closer match to prompt but potentially lower quality"
             )
 
             num_inference_steps = st.slider(
-                "Verfeinerungsgrad",
+                "Inference Steps",
                 min_value=20,
                 max_value=100,
                 value=50,
                 step=5,
-                help="Entwurf (20) | Standard (30) | Premium (50+)"
+                help="More steps = better quality but slower generation"
             )
 
             scheduler = st.selectbox(
-                "Rendering-Qualität",
-                options=["Premium-Qualität",
-                "Standard-Produktion",
-                "Schnellvorschau",
-                "Kreativ-Exploration"],
+                "Scheduler",
+                options=["DPM++ 2M Karras", "DPM++ 2M", "Euler", "Euler A"],
                 index=0,
-                help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows"
+                help="Different schedulers produce different image characteristics"
             )
 
             seed = st.number_input(
@@ -323,9 +320,9 @@ def main():
             st.markdown('<p class="parameter-title"></p>', unsafe_allow_html=True)
 
             negative_prompt = st.text_area(
-                "Ausschlusskriterien",
-                placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
-                help="Markensicherheit & Ausschlüsse",
+                "Negative Prompt",
+                placeholder="What you don't want in the image...",
+                help="Specify elements to avoid in the generation",
                 height=400
 
             )
@@ -343,33 +340,48 @@ def main():
 
         # Add parameter descriptions directly without nested expander
         st.markdown("""
-             <div style="color: #ffffff; background-color: #424242; padding: 15px; border-radius: 4px; border: 1px solid #616161;">
-        <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Workflow-Voreinstellungen</h4>
+            <div style="
+                color: #ffffff;
+                background-color: #424242;
+                padding: 15px;
+                border-radius: 4px;
+                border: 1px solid #616161;
+            ">
+            <h4 style="
+                color: #ffffff;
+                margin-bottom: 10px;
+                font-weight: 500;
+            ">Understanding the Parameters</h4>
 
-        <p style="color: #bdbdbd;">
-            <strong style="color: #ffffff;">Schnellkonzept:</strong>
-            Ideal für erste Entwürfe und Ideenfindung
-            - Niedrige Markentreue
-            - Schnellvorschau
-            - 20 Verfeinerungsschritte
-        </p>
+            <p style="color: #bdbdbd;">
+                <strong style="color: #ffffff;">Guidance Scale:</strong>
+                Controls how closely the image follows your prompt. Higher values produce images that more strictly follow the prompt but might be less creative.
+            </p>
 
-        <p style="color: #bdbdbd;">
-            <strong style="color: #ffffff;">Produktionsstandard:</strong>
-            Ausgewogene Einstellungen für die tägliche Produktion
-            - Mittlere Markentreue
-            - Standard-Produktion
-            - 30 Verfeinerungsschritte
-        </p>
+            <p style="color: #bdbdbd;">
+                <strong style="color: #ffffff;">Scheduler:</strong>
+                Different algorithms for generating the image. Each has its own characteristics:
+            </p>
+            <ul style="
+                margin-left: 20px;
+                color: #bdbdbd;
+            ">
+                <li><strong style="color: #ffffff;">DPM++ 2M Karras:</strong> Best overall quality</li>
+                <li><strong style="color: #ffffff;">DPM++ 2M:</strong> Good balance of speed and quality</li>
+                <li><strong style="color: #ffffff;">Euler:</strong> Fast generation</li>
+                <li><strong style="color: #ffffff;">Euler A:</strong> More creative results</li>
+            </ul>
+            </p>
+            <p style="color: #bdbdbd;">
+                <strong style="color: #ffffff;">Inference Steps:</strong>
+                The number of refinement steps. More steps generally mean better quality but longer generation time.
+            </p>
 
-        <p style="color: #bdbdbd;">
-            <strong style="color: #ffffff;">Kundenpräsentation:</strong>
-            Höchste Qualität für finale Präsentationen
-            - Hohe Markentreue
-            - Premium-Qualität
-            - 40+ Verfeinerungsschritte
-        </p>
-        </div>
+            <p style="color: #bdbdbd;">
+                <strong style="color: #ffffff;">Negative Prompt:</strong>
+                Specify what you don't want in the image. Useful for avoiding unwanted elements.
+            </p>
+            </div>
         """, unsafe_allow_html=True)
 
 
