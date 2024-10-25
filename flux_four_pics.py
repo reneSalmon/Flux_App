@@ -223,6 +223,12 @@ def main():
     with col2:
         num_outputs = st.number_input("Anzahl Varianten", min_value=1, max_value=4, value=1)
 
+    # Move width and height to the main interface
+    col3, col4 = st.columns(2)
+    with col3:
+        width = st.number_input("Breite", min_value=128, max_value=1024, value=1024, step=128)
+    with col4:
+        height = st.number_input("Höhe", min_value=128, max_value=1024, value=768, step=128)
 
     if st.button("✨Bild generieren✨"):
         if not prompt:
@@ -302,10 +308,6 @@ def main():
         col_tune1, col_tune2 = st.columns(2)
 
         with col_tune1:
-            width = st.number_input("Breite", min_value=128, max_value=1024, value=1024, step=128)
-
-            height = st.number_input("Höhe", min_value=128, max_value=1024, value=768, step=128)
-
             guidance_scale = st.slider(
                 "Gestaltungsfreiheit",
                 min_value=1.0,
