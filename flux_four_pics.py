@@ -208,27 +208,16 @@ def main():
         )
 
     # Input controls (make sure this is at the same indentation level as other main content)
-    col1, col2= st.columns(2)
+    col1, col2, col3= st.columns(3)
     with col1:
-        scheduler = st.selectbox(
-                        "Bildwiedergabe Optionen",
-                        options=["Premium-Qualität (DPM++ 2M Karras)",
-                        "Standard-Produktion (DPM++ 2M)",
-                        "Schnellvorschau (Euler)",
-                        "Kreativ-Exploration (Euler A)"],
-                        index=0,
-                        help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows"
-                    )
+        width = st.number_input("Breite", min_value=128, max_value=1024, value=1024, step=128)
 
     with col2:
+        height = st.number_input("Höhe", min_value=128, max_value=1024, value=768, step=128)
+
+    with col3:
         num_outputs = st.number_input("Anzahl Varianten", min_value=1, max_value=4, value=1)
 
-    # Move width and height to the main interface
-    col3, col4 = st.columns(2)
-    with col3:
-        width = st.number_input("Breite", min_value=128, max_value=1024, value=1024, step=128)
-    with col4:
-        height = st.number_input("Höhe", min_value=128, max_value=1024, value=768, step=128)
 
     if st.button("✨Bild generieren✨"):
         if not prompt:
@@ -308,6 +297,16 @@ def main():
         col_tune1, col_tune2 = st.columns(2)
 
         with col_tune1:
+            scheduler = st.selectbox(
+                        "Bildwiedergabe Optionen",
+                        options=["Premium-Qualität (DPM++ 2M Karras)",
+                        "Standard-Produktion (DPM++ 2M)",
+                        "Schnellvorschau (Euler)",
+                        "Kreativ-Exploration (Euler A)"],
+                        index=0,
+                        help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows"
+                    )
+
             guidance_scale = st.slider(
                 "Gestaltungsfreiheit",
                 min_value=1.0,
