@@ -3,6 +3,7 @@ import requests
 import time
 from io import BytesIO
 from PIL import Image
+import base64
 
 # Get API key from Streamlit secrets
 API_KEY = st.secrets["FLUX_API_KEY"]
@@ -21,14 +22,13 @@ def generate_images(prompt, width, height, num_images, model_params):
             'https://api.bfl.ml/v1/flux-pro-1.1',
             headers={
                 'accept': 'application/json',
-                'x-key': API_KEY,  # Using secret API key
+                'x-key': API_KEY,
                 'Content-Type': 'application/json',
             },
             json={
                 'prompt': prompt,
                 'width': width,
                 'height': height,
-                'num_outputs': 1,
                 **model_params
             },
         ).json()
@@ -46,7 +46,7 @@ def generate_images(prompt, width, height, num_images, model_params):
                 'https://api.bfl.ml/v1/get_result',
                 headers={
                     'accept': 'application/json',
-                    'x-key': API_KEY,  # Using secret API key
+                    'x-key': API_KEY,
                 },
                 params={
                     'id': request_id,
@@ -72,14 +72,32 @@ def generate_images(prompt, width, height, num_images, model_params):
     return image_urls
 
 def main():
-
-
-    # Add the seed presets dictionary right before the seed input
-    preset_seeds = {
-        "Kreativ-Exploration: Brainstorming & Ideation": -1,
-        "Kampagnen-Erstellung: Ein Konzept, Multiple Varianten": 12345,
-        "Konsistente Marken-Bilderwelt: Stricktes folgen der Guidelines": 67890
-
+    # Update the preset dictionary with optimized parameters
+    preset_params = {
+        "Konsistente Bilderwelt (Strikte Kontrolle & Höchste Qualität)": {
+            "seed": 67890,
+            "guidance_scale": 12.0,
+            "num_inference_steps": 100,
+            "scheduler": "Premium-Qualität (DPM++ 2M Karras)",
+            "description": "Maximale Kontrolle über visuelle Identität",
+            "num_outputs": 1
+        },
+        "Kampagnen-Erstellung (Ein Konzept, Multiple Varianten)": {
+            "seed": 12345,
+            "guidance_scale": 7.5,
+            "num_inference_steps": 50,
+            "scheduler": "Standard-Produktion (DPM++ 2M)",
+            "description": "Konsistente Basis mit kontrollierten Variationen",
+            "num_outputs": 4
+        },
+        "Kreativ-Exploration (Maximale Freiheit)": {
+            "seed": -1,
+            "guidance_scale": 3.0,
+            "num_inference_steps": 30,
+            "scheduler": "Kreativ-Exploration (Euler A)",
+            "description": "Maximale kreative Freiheit für neue Ideen",
+            "num_outputs": 4
+        }
     }
 
     st.markdown("<h1 class='title'>AI Image Generator | Flux 1.1 Pro </h1>", unsafe_allow_html=True)
@@ -189,9 +207,39 @@ def main():
             padding: 10px 0;
             margin: 100px 0;
         }
+         /* Add this to your existing CSS styles */
+        /* Add this to your existing CSS styles */
+        .download-button {
+            width: 100%;
+            height: 50px;
+            background-color: transparent;
+            color: white;
+            border-radius: 4px;
+            border: 1px solid #757575;
+            padding: 8px 16px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px auto;
+        }
+
+        .download-button:hover {
+            background-color: rgba(158, 158, 158, 0.1);
+            border-color: #9e9e9e;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .center-content {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin: 20px 0;
+        }
+
         </style>
     """, unsafe_allow_html=True)
-
 
 
     prompt = st.text_area(
@@ -200,15 +248,19 @@ def main():
         placeholder="Beschreibe dein Bild..."
     )
 
-    # Add preset selector before the seed input
+    # First selectbox (Ziel des Bildes)
     seed_preset = st.selectbox(
         "Ziel des Bildes",
-        options=list(preset_seeds.keys()),
-        help="Wählen Sie einen vordefinierten Modus für Ihre Marketingziele"
-        )
+        options=list(preset_params.keys()),
+        help="Wähle eine vordefinierten Modus für deine Marketingziele",
+        key="preset_selector1"
+    )
 
-    # Input controls (make sure this is at the same indentation level as other main content)
-    col1, col2, col3= st.columns(3)
+    # Get the selected preset parameters
+    selected_preset = preset_params[seed_preset] if seed_preset else preset_params[list(preset_params.keys())[0]]
+
+    # Input controls
+    col1, col2, col3 = st.columns(3)
     with col1:
         width = st.number_input("Breite", min_value=128, max_value=1024, value=1024, step=128)
 
@@ -216,10 +268,24 @@ def main():
         height = st.number_input("Höhe", min_value=128, max_value=1024, value=768, step=128)
 
     with col3:
-        num_outputs = st.number_input("Anzahl Varianten", min_value=1, max_value=4, value=1)
+        num_outputs = st.number_input(
+            "Anzahl Varianten",
+            min_value=1,
+            max_value=4,
+            value=selected_preset["num_outputs"],
+            key=f"num_outputs_{seed_preset}"
+        )
 
+    # Update model parameters
+    model_params = {
+        "seed": selected_preset["seed"],
+        "guidance_scale": selected_preset["guidance_scale"],
+        "num_inference_steps": selected_preset["num_inference_steps"],
+        "scheduler": selected_preset["scheduler"].split(" (")[0],
+        "num_outputs": selected_preset["num_outputs"]
+    }
 
-    if st.button("✨Bild generieren✨"):
+    if st.button("✨Bilder generieren✨"):
         if not prompt:
             st.error("Please enter a prompt first!")
             return
@@ -228,42 +294,72 @@ def main():
             with st.spinner('Creating your masterpieces...'):
                 start_time = time.time()
 
-                # Generate images with user-specified parameters
-                image_urls = generate_images(prompt, width, height, num_outputs, {})
+                # Generate images with the complete model_params
+                image_urls = generate_images(
+                    prompt=prompt,
+                    width=width,
+                    height=height,
+                    num_images=model_params["num_outputs"],
+                    model_params=model_params
+                )
 
                 if image_urls:
-                    st.success("✨ Images generated successfully!")
+                    st.success("✨ Bilder erfolgreich generiert!")
 
-                    # Create columns for displaying images
-                    cols = st.columns(2)
+                # Store all images data
+                all_images_data = []
 
-                    # Display images in a grid
-                    for idx, url in enumerate(image_urls):
-                        # Get the image
-                        image_response = requests.get(
-                            url,
-                            headers={
-                                'accept': 'application/json',
-                                'x-key': API_KEY,  # Using secret API key
-                            }
+                # Process and display images
+                for idx, url in enumerate(image_urls):
+                    image_response = requests.get(
+                        url,
+                        headers={
+                            'accept': 'application/json',
+                            'x-key': API_KEY,
+                        }
+                    )
+
+                    if image_response.status_code == 200:
+                        # Store image data
+                        all_images_data.append(image_response.content)
+
+                        # Convert to PIL Image for display
+                        image = Image.open(BytesIO(image_response.content))
+
+                        # Display image with full column width
+                        st.image(
+                            image,
+                            caption=f"Generiertes Bild {idx + 1}",
+                            use_column_width="always"
                         )
 
-                        if image_response.status_code == 200:
-                            # Convert to PIL Image
-                            image = Image.open(BytesIO(image_response.content))
+                # Create centered container for single download button
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    # Create a ZIP in memory
+                    import io
+                    import zipfile
 
-                            # Display in appropriate column
-                            with cols[idx % 2]:
-                                st.image(image, caption=f"Generated Image {idx + 1}")
-                                st.download_button(
-                                    label=f"📥 Download Image {idx + 1}",
-                                    data=image_response.content,
-                                    file_name=f"generated_image_{idx + 1}.png",
-                                    mime="image/png"
-                                )
+                    zip_buffer = io.BytesIO()
+                    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                        for idx, img_data in enumerate(all_images_data):
+                            zip_file.writestr(f"generated_image_{idx + 1}.png", img_data)
 
-                end_time = time.time()
-                st.metric("Total Generation Time", f"{end_time - start_time:.2f} seconds")
+                    # Add single download button
+                    st.download_button(
+                        label="Bilder herunterladen",
+                        data=zip_buffer.getvalue(),
+                        file_name="generated_images.zip",
+                        mime="application/zip",
+                        key=f"download_all_{time.time()}",  # Unique key using timestamp
+                        use_container_width=True
+                    )
+
+                # Add generation time
+                st.markdown(
+                    f'<p style="color: #757575; text-align: center;"> Generierungszeit: {(time.time() - start_time):.2f} Sekunden</p>',
+                    unsafe_allow_html=True
+                )
 
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
@@ -294,24 +390,42 @@ def main():
             </style>
             """, unsafe_allow_html=True)
 
-        #col_tune1, col_tune2 = st.columns(2)
+        # Update the parameters based on selected preset
+        if seed_preset:
+            selected_preset = preset_params[seed_preset]
+            preset_seed = selected_preset["seed"]
+            preset_guidance = selected_preset["guidance_scale"]
+            preset_steps = selected_preset["num_inference_steps"]
+            preset_scheduler = selected_preset["scheduler"]
+            preset_num_outputs = selected_preset["num_outputs"]
+        else:
+            # Use default values if no preset is selected
+            preset_seed = default_values["seed"]
+            preset_guidance = default_values["guidance_scale"]
+            preset_steps = default_values["num_inference_steps"]
+            preset_scheduler = default_values["scheduler"]
+            preset_num_outputs = default_values["num_outputs"]
 
-        #with col_tune1:
+        # Now use the preset values in your inputs
         scheduler = st.selectbox(
-                    "Bildwiedergabe Optionen",
-                    options=["Premium-Qualität (DPM++ 2M Karras)",
+            "Bildwiedergabe Optionen",
+            options=["Premium-Qualität (DPM++ 2M Karras)",
                     "Standard-Produktion (DPM++ 2M)",
                     "Schnellvorschau (Euler)",
                     "Kreativ-Exploration (Euler A)"],
-                    index=0,
-                    help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows"
-                )
+            index=["Premium-Qualität (DPM++ 2M Karras)",
+                "Standard-Produktion (DPM++ 2M)",
+                "Schnellvorschau (Euler)",
+                "Kreativ-Exploration (Euler A)"].index(preset_scheduler),
+            help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows",
+            key="scheduler_selector2"
+        )
 
         guidance_scale = st.slider(
             "Gestaltungsfreiheit",
             min_value=1.0,
             max_value=20.0,
-            value=7.5,
+            value=preset_guidance,
             step=0.5,
             help="Niedrig: Maximale kreative Freiheit | Hoch: Strikte Markentreue"
         )
@@ -320,46 +434,30 @@ def main():
             "Detailgenauigkeit",
             min_value=20,
             max_value=100,
-            value=50,
+            value=preset_steps,
             step=5,
             help="Niedrig: Schnelle Vorschau (20) | Standard: Produktionsqualität (30) | Premium: Maximale Details (50+)"
         )
 
-
-        # Update seed value based on preset
-        if seed_preset:
-            preset_seed = preset_seeds[seed_preset]
-        else:
-            preset_seed = -1
-
-        # Modified seed input to use preset value
+        # Update seed input to use preset value
         seed = st.number_input(
             "Reproduzierbarkeit",
             min_value=-1,
             max_value=2147483647,
             value=preset_seed,
-            help="Setzen Sie einen spezifischen Wert für wiederholbare Ergebnisse. -1 für zufällige Generierung"
+            help="Setzen Sie einen spezifischen Wert für wiederholbare Ergebnisse. -1 für zufällige Generierung",
+            key="seed_input1"  # Add unique key
         )
-        safety_checker = st.checkbox(
-            "Sicherheits-Filter aktiv",
-            value=True,
-            help="Filter out NSFW content"
-        )
-    #with col_tune2:
-        negative_prompt = st.text_area(
-            "Ausschlusskriterien",
-            placeholder="Definieren Sie unerwünschte Elemente, Stilkonflikte...",
-            help="Markensicherheit & Ausschlüsse",
-            height=150
-            )
-        # Add separator with material design style
-        st.markdown("""
-            <div style="
-                height: 1px;
-                background: linear-gradient(to right, #424242, #757575, #424242);
-                margin: 20px 0;
-            "></div>
-            """, unsafe_allow_html=True)
+
+        # Update the model parameters when generating images
+        # Update the model parameters
+        model_params = {
+                "seed": preset_seed,
+                "guidance_scale": preset_guidance,
+                "num_inference_steps": preset_steps,
+                "scheduler": scheduler.split(" (")[0],
+                "num_outputs": preset_num_outputs
+        }
 
         # Add parameter descriptions directly without nested expander
         # Add this markdown section after the seed_preset selectbox or in the expander section
@@ -368,35 +466,43 @@ def main():
             <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Ziele des Bildes - Voreinstellungen</h4>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Kreativ-Exploration: Brainstorming & Ideation</strong><br>
-                • Maximale kreative Freiheit für neue Ideen
-                • Zufällige Ergebnisse für Inspiration
-                • Ideal für: Konzeptfindung, Moodboards, erste Entwürfe
-                • Technisch: Zufälliger Seed (-1), niedrige Markentreue
+                <strong style="color: #ffffff;">Kreativ-Exploration: Brainstorming & Ideation</strong>
+                <ul style="margin-left: 20px; color: #bdbdbd;">
+                    <li>Maximale kreative Freiheit für neue Ideen</li>
+                    <li>Zufällige Ergebnisse für Inspiration</li>
+                    <li>Ideal für: Konzeptfindung, Moodboards, erste Entwürfe</li>
+                    <li>Technisch: Zufälliger Seed (-1), niedrige Markentreue</li>
+                </ul>
             </p>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Kampagnen-Erstellung: Ein Konzept, Multiple Varianten</strong><br>
-                • Konsistente Basis mit kontrollierten Variationen
-                • Reproduzierbare Ergebnisse für A/B-Tests
-                • Ideal für: Kampagnen-Rollout, Content-Serien, Social Media
-                • Technisch: Fester Seed (12345), mittlere Markentreue
+                <strong style="color: #ffffff;">Kampagnen-Erstellung: Ein Konzept, Multiple Varianten</strong>
+                <ul style="margin-left: 20px; color: #bdbdbd;">
+                    <li>Konsistente Basis mit kontrollierten Variationen</li>
+                    <li>Reproduzierbare Ergebnisse für A/B-Tests</li>
+                    <li>Ideal für: Kampagnen-Rollout, Content-Serien, Social Media</li>
+                    <li>Technisch: Fester Seed (12345), mittlere Markentreue</li>
+                </ul>
             </p>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Konsistente Marken-Bilderwelt: Striktes Folgen der Guidelines</strong><br>
-                • Maximale Kontrolle über visuelle Identität
-                • Präzise Einhaltung von Markenrichtlinien
-                • Ideal für: Kundenaufträge, Corporate Design, Markenkommunikation
-                • Technisch: Fester Seed (67890), hohe Markentreue
+                <strong style="color: #ffffff;">Konsistente Marken-Bilderwelt: Striktes Folgen der Guidelines</strong>
+                <ul style="margin-left: 20px; color: #bdbdbd;">
+                    <li>Maximale Kontrolle über visuelle Identität</li>
+                    <li>Präzise Einhaltung von Markenrichtlinien</li>
+                    <li>Ideal für: Kundenaufträge, Corporate Design, Markenkommunikation</li>
+                    <li>Technisch: Fester Seed (67890), hohe Markentreue</li>
+                </ul>
             </p>
 
             <p style="color: #bdbdbd; margin-top: 15px;">
-                <strong style="color: #ffffff;">Anwendung:</strong><br>
-                Wählen Sie die Voreinstellung entsprechend Ihres Projektziels. Die Parameter werden automatisch optimiert für:
-                • Kreativität vs. Kontrolle
-                • Variation vs. Konsistenz
-                • Experimentell vs. Markentreu
+                <strong style="color: #ffffff;">Anwendung:</strong>
+                <ul style="margin-left: 20px; color: #bdbdbd;">
+                    <li>Kreativität vs. Kontrolle</li>
+                    <li>Variation vs. Konsistenz</li>
+                    <li>Experimentell vs. Markentreu</li>
+                </ul>
+                Wählen Sie die Voreinstellung entsprechend Ihres Projektziels. Die Parameter werden automatisch optimiert für die Balance zwischen diesen Faktoren.
             </p>
             </div>
         """, unsafe_allow_html=True)
@@ -424,9 +530,11 @@ def main():
             <p style="color: #bdbdbd;">
                 <strong style="color: #ffffff;">Detailgenauigkeit:</strong>
                 Bestimmt die Feinheit der Ausarbeitung. Mehr Details bedeuten bessere Qualität, aber längere Generierungszeit:
-                • Entwurf (20): Schnelle Konzeptvisualisierung
-                • Standard (30): Ausgewogene Produktionsqualität
-                • Premium (50+): Maximale Detailtiefe
+                <ul style="margin-left: 20px; color: #bdbdbd;">
+                    <li><strong style="color: #ffffff;">Entwurf (20):</strong> Schnelle Konzeptvisualisierung</li>
+                    <li><strong style="color: #ffffff;">Standard (30):</strong> Ausgewogene Produktionsqualität</li>
+                    <li><strong style="color: #ffffff;">Premium (50+):</strong> Maximale Detailtiefe</li>
+                </ul>
             </p>
 
             <p style="color: #bdbdbd;">
