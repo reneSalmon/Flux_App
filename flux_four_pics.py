@@ -271,7 +271,7 @@ def main():
 
     # First selectbox (Ziel des Bildes)
     seed_preset = st.selectbox(
-        "Modus auswählen",
+        "Modus:",
         options=list(preset_params.keys()),
         help="Wähle eine vordefinierten Modus für deine Marketingziele",
         key="preset_selector"
