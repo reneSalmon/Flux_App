@@ -444,7 +444,7 @@ def main():
 
         # Now use the preset values in your inputs
         scheduler = st.selectbox(
-            "Bildwiedergabe Optionen",
+            "Algorithmus auswählen",
             options=["Premium-Qualität (DPM++ 2M Karras)",
                     "Standard-Produktion (DPM++ 2M)",
                     "Schnellvorschau (Euler)",
@@ -552,7 +552,7 @@ def main():
             </p>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Bildwiedergabe Optionen:</strong>
+                <strong style="color: #ffffff;">Algorithmus auswählen:</strong>
                 Verschiedene Algorithmen für unterschiedliche Anwendungsfälle:
             </p>
             <ul style="margin-left: 20px; color: #bdbdbd;">
