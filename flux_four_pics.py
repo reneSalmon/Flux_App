@@ -95,7 +95,7 @@ def main():
     # Update the preset dictionary with optimized parameters
 # Update the preset dictionary with optimized parameters
     preset_params = {
-        "Konsistente Bilderwelt - Striktes Folgen deiner Guidelines": {
+        "01 | Folgt strickt deinem Konzept in höchster Qualität": {
             "seed": 67890,
             "guidance_scale": 12.0,
             "num_inference_steps": 100,
@@ -103,7 +103,7 @@ def main():
             "description": "Maximale Kontrolle über visuelle Identität",
             "num_outputs": 1
         },
-        "Kampagnen-Erstellung - Ein Konzept, Multiple Varianten": {
+        "02 | Folgt deinem Konzept mit kontrollierten Variationen": {
             "seed": 12345,
             "guidance_scale": 7.5,
             "num_inference_steps": 50,
@@ -111,7 +111,7 @@ def main():
             "description": "Konsistente Basis mit kontrollierten Variationen",
             "num_outputs": 4
         },
-        "Kreativ-Exploration - Maximale Freiheit für neue Ideen": {
+        "03 | Findet kreative Ideen für dein Konzept": {
             "seed": -1,
             "guidance_scale": 3.0,
             "num_inference_steps": 30,
@@ -501,7 +501,7 @@ def main():
             <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Ziele des Bildes - Voreinstellungen</h4>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Konsistente Marken-Bilderwelt: Striktes Folgen der Guidelines</strong>
+                <strong style="color: #ffffff;">Folgt strikt deinem Konzept in höchster Qualität</strong>
                 <ul style="margin-left: 20px; color: #bdbdbd;">
                     <li>Maximale Kontrolle über visuelle Identität</li>
                     <li>Präzise Einhaltung von Markenrichtlinien</li>
@@ -511,7 +511,7 @@ def main():
             </p>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Kampagnen-Erstellung: Ein Konzept, Multiple Varianten</strong>
+                <strong style="color: #ffffff;">Folgt deinem Konzept mit kontrollierten Variationen</strong>
                 <ul style="margin-left: 20px; color: #bdbdbd;">
                     <li>Konsistente Basis mit kontrollierten Variationen</li>
                     <li>Reproduzierbare Ergebnisse für A/B-Tests</li>
@@ -521,7 +521,7 @@ def main():
             </p>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Kreativ-Exploration: Maximale Freiheit</strong>
+                <strong style="color: #ffffff;">Findet kreative Ideen für dein Konzept</strong>
                 <ul style="margin-left: 20px; color: #bdbdbd;">
                     <li>Maximale kreative Freiheit für neue Ideen</li>
                     <li>Zufällige Ergebnisse für Inspiration</li>
