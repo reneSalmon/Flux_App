@@ -12,10 +12,21 @@ def generate_images(prompt, width, height, num_images, model_params):
     image_urls = []  # List to store image URLs
     progress_text = st.empty()
     progress_bar = st.progress(0)
+    status_container = st.empty()
 
     for i in range(num_images):
         progress_text.text(f"Generating image {i+1} of {num_images}...")
         progress_bar.progress((i) / num_images)
+
+        # Create a copy of model_params for each iteration
+        current_params = model_params.copy()
+
+        # If seed is -1 or not set, generate a unique seed for each image
+        if 'seed' not in current_params or current_params['seed'] == -1:
+            current_params['seed'] = int(time.time() * 1000) + i
+        else:
+            # If seed is set, increment it for each image to ensure variation
+            current_params['seed'] = current_params['seed'] + i
 
         # Initial request to generate image
         response = requests.post(
@@ -29,7 +40,8 @@ def generate_images(prompt, width, height, num_images, model_params):
                 'prompt': prompt,
                 'width': width,
                 'height': height,
-                **model_params
+                'num_outputs': 1,
+                **current_params
             },
         ).json()
 
@@ -39,7 +51,6 @@ def generate_images(prompt, width, height, num_images, model_params):
             continue
 
         # Poll for results
-        status_text = st.empty()
         while True:
             time.sleep(0.5)
             result = requests.get(
@@ -54,7 +65,7 @@ def generate_images(prompt, width, height, num_images, model_params):
             ).json()
 
             status = result.get("status")
-            status_text.text(f"Status for image {i+1}: {status}")
+            status_container.text(f"Status for image {i+1}: {status}")
 
             if status == "Ready":
                 image_url = result['result']['sample']
@@ -67,14 +78,24 @@ def generate_images(prompt, width, height, num_images, model_params):
 
         progress_bar.progress((i + 1) / num_images)
 
-    progress_text.text("All images generated!")
-    progress_bar.progress(1.0)
+    progress_text.empty()
+    progress_bar.empty()
+    status_container.empty()
     return image_urls
 
 def main():
+
+    # Initialize default values
+    seed_preset = None
+    preset_scheduler = 'Standard-Produktion (DPM++ 2M)'  # Default value
+    guidance_scale = 7.5  # Default value
+    num_inference_steps = 50  # Default value
+    seed = -1  # Default value
+
     # Update the preset dictionary with optimized parameters
+# Update the preset dictionary with optimized parameters
     preset_params = {
-        "Konsistente Bilderwelt (Strikte Kontrolle & Höchste Qualität)": {
+        "Konsistente Marken-Bilderwelt (Strikte Kontrolle)": {
             "seed": 67890,
             "guidance_scale": 12.0,
             "num_inference_steps": 100,
@@ -253,7 +274,7 @@ def main():
         "Ziel des Bildes",
         options=list(preset_params.keys()),
         help="Wähle eine vordefinierten Modus für deine Marketingziele",
-        key="preset_selector1"
+        key="preset_selector"
     )
 
     # Get the selected preset parameters
@@ -294,73 +315,88 @@ def main():
             with st.spinner('Creating your masterpieces...'):
                 start_time = time.time()
 
+                # Get the selected preset parameters
+                if seed_preset:
+                    selected_preset = preset_params[seed_preset]
+
+                    # Create model parameters dictionary with all settings
+                    model_params = {
+                        "seed": selected_preset["seed"] if selected_preset["seed"] == -1 else int(time.time()),  # New seed each time unless random
+                        "guidance_scale": selected_preset["guidance_scale"],
+                        "num_inference_steps": selected_preset["num_inference_steps"],
+                        "scheduler": selected_preset["scheduler"].split(" (")[0]
+                    }
+                else:
+                    # Default parameters if no preset is selected
+                    model_params = {
+                        "seed": int(time.time()),  # Generate new seed each time
+                        "guidance_scale": 7.5,
+                        "num_inference_steps": 50,
+                        "scheduler": "Standard-Produktion (DPM++ 2M)"
+                    }
+
                 # Generate images with the complete model_params
-                image_urls = generate_images(
-                    prompt=prompt,
-                    width=width,
-                    height=height,
-                    num_images=model_params["num_outputs"],
-                    model_params=model_params
-                )
+                image_urls = generate_images(prompt, width, height, num_outputs, model_params)
 
                 if image_urls:
                     st.success("✨ Bilder erfolgreich generiert!")
+                    # ... rest of the code remains the same ...
 
-                # Store all images data
-                all_images_data = []
+                    # Store all images data
+                    all_images_data = []
 
-                # Process and display images
-                for idx, url in enumerate(image_urls):
-                    image_response = requests.get(
-                        url,
-                        headers={
-                            'accept': 'application/json',
-                            'x-key': API_KEY,
-                        }
-                    )
-
-                    if image_response.status_code == 200:
-                        # Store image data
-                        all_images_data.append(image_response.content)
-
-                        # Convert to PIL Image for display
-                        image = Image.open(BytesIO(image_response.content))
-
-                        # Display image with full column width
-                        st.image(
-                            image,
-                            caption=f"Generiertes Bild {idx + 1}",
-                            use_column_width="always"
+                    # Process and display images
+                    for idx, url in enumerate(image_urls):
+                        image_response = requests.get(
+                            url,
+                            headers={
+                                'accept': 'application/json',
+                                'x-key': API_KEY,
+                            }
                         )
 
-                # Create centered container for single download button
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col2:
-                    # Create a ZIP in memory
-                    import io
-                    import zipfile
+                        if image_response.status_code == 200:
+                            # Store image data
+                            all_images_data.append(image_response.content)
 
-                    zip_buffer = io.BytesIO()
-                    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                        for idx, img_data in enumerate(all_images_data):
-                            zip_file.writestr(f"generated_image_{idx + 1}.png", img_data)
+                            # Convert to PIL Image for display
+                            image = Image.open(BytesIO(image_response.content))
 
-                    # Add single download button
-                    st.download_button(
-                        label="Bilder herunterladen",
-                        data=zip_buffer.getvalue(),
-                        file_name="generated_images.zip",
-                        mime="application/zip",
-                        key=f"download_all_{time.time()}",  # Unique key using timestamp
-                        use_container_width=True
-                    )
+                            # Display image with full column width
+                            st.image(
+                                image,
+                                caption=f"Generiertes Bild {idx + 1}",
+                                use_column_width="always"
+                            )
 
-                # Add generation time
-                st.markdown(
-                    f'<p style="color: #757575; text-align: center;"> Generierungszeit: {(time.time() - start_time):.2f} Sekunden</p>',
-                    unsafe_allow_html=True
-                )
+                    # Create centered container for single download button
+                    col1, col2, col3 = st.columns([1, 2, 1])
+                    with col2:
+                        # Create a ZIP in memory
+                        import io
+                        import zipfile
 
+                        zip_buffer = io.BytesIO()
+                        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                            for idx, img_data in enumerate(all_images_data):
+                                zip_file.writestr(f"generated_image_{idx + 1}.png", img_data)
+
+                        # Add single download button for ZIP file
+                        st.download_button(
+                            label="Bilder herunterladen",
+                            data=zip_buffer.getvalue(),
+                            file_name="generated_images.zip",
+                            mime="application/zip",
+                            key=f"download_all_{time.time()}",  # Unique key using timestamp
+                            use_container_width=True
+                        )
+
+
+                        # Add generation time
+                        st.markdown(
+                            f'<p style="color: #757575; text-align: center;">Generierungszeit: {(time.time() - start_time):.2f} Sekunden</p>',
+                            unsafe_allow_html=True
+                        )
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
 
@@ -397,14 +433,14 @@ def main():
             preset_guidance = selected_preset["guidance_scale"]
             preset_steps = selected_preset["num_inference_steps"]
             preset_scheduler = selected_preset["scheduler"]
-            preset_num_outputs = selected_preset["num_outputs"]
+            num_outputs = selected_preset["num_outputs"]
         else:
             # Use default values if no preset is selected
-            preset_seed = default_values["seed"]
-            preset_guidance = default_values["guidance_scale"]
-            preset_steps = default_values["num_inference_steps"]
-            preset_scheduler = default_values["scheduler"]
-            preset_num_outputs = default_values["num_outputs"]
+            num_outputs = 1
+            preset_seed = -1
+            preset_guidance = 7.5
+            preset_steps = 50
+            preset_scheduler = "Premium-Qualität (DPM++ 2M Karras)"
 
         # Now use the preset values in your inputs
         scheduler = st.selectbox(
@@ -418,7 +454,7 @@ def main():
                 "Schnellvorschau (Euler)",
                 "Kreativ-Exploration (Euler A)"].index(preset_scheduler),
             help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows",
-            key="scheduler_selector2"
+            key="scheduler_selector"
         )
 
         guidance_scale = st.slider(
@@ -446,17 +482,16 @@ def main():
             max_value=2147483647,
             value=preset_seed,
             help="Setzen Sie einen spezifischen Wert für wiederholbare Ergebnisse. -1 für zufällige Generierung",
-            key="seed_input1"  # Add unique key
+            key="seed_input"  # Add unique key
         )
 
         # Update the model parameters when generating images
         # Update the model parameters
         model_params = {
-                "seed": preset_seed,
-                "guidance_scale": preset_guidance,
-                "num_inference_steps": preset_steps,
-                "scheduler": scheduler.split(" (")[0],
-                "num_outputs": preset_num_outputs
+                "seed": seed,
+                "guidance_scale": guidance_scale,
+                "num_inference_steps": num_inference_steps,
+                "scheduler": scheduler.split(" (")[0]
         }
 
         # Add parameter descriptions directly without nested expander
