@@ -95,7 +95,7 @@ def main():
     # Update the preset dictionary with optimized parameters
 # Update the preset dictionary with optimized parameters
     preset_params = {
-        "Konsistente Marken-Bilderwelt (Strikte Kontrolle)": {
+        "Konsistente Bilderwelt - Striktes Folgen deiner Guidelines": {
             "seed": 67890,
             "guidance_scale": 12.0,
             "num_inference_steps": 100,
@@ -103,7 +103,7 @@ def main():
             "description": "Maximale Kontrolle über visuelle Identität",
             "num_outputs": 1
         },
-        "Kampagnen-Erstellung (Ein Konzept, Multiple Varianten)": {
+        "Kampagnen-Erstellung - Ein Konzept, Multiple Varianten": {
             "seed": 12345,
             "guidance_scale": 7.5,
             "num_inference_steps": 50,
@@ -111,7 +111,7 @@ def main():
             "description": "Konsistente Basis mit kontrollierten Variationen",
             "num_outputs": 4
         },
-        "Kreativ-Exploration (Maximale Freiheit)": {
+        "Kreativ-Exploration - Maximale Freiheit für neue Ideen": {
             "seed": -1,
             "guidance_scale": 3.0,
             "num_inference_steps": 30,
@@ -458,12 +458,12 @@ def main():
         )
 
         guidance_scale = st.slider(
-            "Gestaltungsfreiheit",
+            "Beachtung deiner Vorgaben",
             min_value=1.0,
             max_value=20.0,
             value=preset_guidance,
             step=0.5,
-            help="Niedrig: Maximale kreative Freiheit | Hoch: Strikte Markentreue"
+            help="Niedrig: Maximale kreative Freiheit | Hoch: Strikte Vorgabentreue"
         )
 
         num_inference_steps = st.slider(
@@ -481,7 +481,7 @@ def main():
             min_value=-1,
             max_value=2147483647,
             value=preset_seed,
-            help="Setzen Sie einen spezifischen Wert für wiederholbare Ergebnisse. -1 für zufällige Generierung",
+            help="Zufällige Generierung (Seed = -1) für kreative Exploration. Feste Seed-Werte für reproduzierbare Ergebnisse",
             key="seed_input"  # Add unique key
         )
 
@@ -501,12 +501,12 @@ def main():
             <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Ziele des Bildes - Voreinstellungen</h4>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Kreativ-Exploration: Brainstorming & Ideation</strong>
+                <strong style="color: #ffffff;">Konsistente Marken-Bilderwelt: Striktes Folgen der Guidelines</strong>
                 <ul style="margin-left: 20px; color: #bdbdbd;">
-                    <li>Maximale kreative Freiheit für neue Ideen</li>
-                    <li>Zufällige Ergebnisse für Inspiration</li>
-                    <li>Ideal für: Konzeptfindung, Moodboards, erste Entwürfe</li>
-                    <li>Technisch: Zufälliger Seed (-1), niedrige Markentreue</li>
+                    <li>Maximale Kontrolle über visuelle Identität</li>
+                    <li>Präzise Einhaltung von Markenrichtlinien</li>
+                    <li>Ideal für: Kundenaufträge, Corporate Design, Markenkommunikation</li>
+                    <li>Technisch: Fester Seed (67890), hohe Markentreue</li>
                 </ul>
             </p>
 
@@ -521,12 +521,12 @@ def main():
             </p>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Konsistente Marken-Bilderwelt: Striktes Folgen der Guidelines</strong>
+                <strong style="color: #ffffff;">Kreativ-Exploration: Maximale Freiheit</strong>
                 <ul style="margin-left: 20px; color: #bdbdbd;">
-                    <li>Maximale Kontrolle über visuelle Identität</li>
-                    <li>Präzise Einhaltung von Markenrichtlinien</li>
-                    <li>Ideal für: Kundenaufträge, Corporate Design, Markenkommunikation</li>
-                    <li>Technisch: Fester Seed (67890), hohe Markentreue</li>
+                    <li>Maximale kreative Freiheit für neue Ideen</li>
+                    <li>Zufällige Ergebnisse für Inspiration</li>
+                    <li>Ideal für: Konzeptfindung, Moodboards, erste Entwürfe</li>
+                    <li>Technisch: Zufälliger Seed (-1), niedrige Markentreue</li>
                 </ul>
             </p>
 
@@ -547,7 +547,7 @@ def main():
             <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Workflow-Optionen</h4>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Gestaltungsfreiheit:</strong>
+                <strong style="color: #ffffff;">Bachtung deiner Vorgaben:</strong>
                 Steuert die Balance zwischen kreativer Freiheit und Prompt-Treue. Höhere Werte erzeugen Bilder, die enger an Ihrer Beschreibung bleiben, können aber weniger kreativ wirken.
             </p>
 
