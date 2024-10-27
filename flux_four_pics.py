@@ -453,12 +453,12 @@ def main():
                 "Standard-Produktion (DPM++ 2M)",
                 "Schnellvorschau (Euler)",
                 "Kreativ-Exploration (Euler A)"].index(preset_scheduler),
-            help="Wählen Sie die Rendering-Qualität entsprechend Ihres Workflows",
+            help="Wählen Sie die Rendering-Qualität entsprechend deines Workflows",
             key="scheduler_selector"
         )
 
         guidance_scale = st.slider(
-            "Beachtung deiner Vorgaben",
+            "Beachtung meiner Vorgaben",
             min_value=1.0,
             max_value=20.0,
             value=preset_guidance,
@@ -501,7 +501,7 @@ def main():
             <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Modus - Voreinstellungen</h4>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Folge strikt meinem Konzept in höchster Qualität</strong>
+                <strong style="color: #ffffff;">01 | Folge strikt meinem Konzept in höchster Qualität</strong>
                 <ul style="margin-left: 20px; color: #bdbdbd;">
                     <li>Maximale Kontrolle über visuelle Identität</li>
                     <li>Präzise Einhaltung von Markenrichtlinien</li>
@@ -511,7 +511,7 @@ def main():
             </p>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Folge meinem Konzept mit kontrollierten Variationen</strong>
+                <strong style="color: #ffffff;">02 | Folge meinem Konzept mit kontrollierten Variationen</strong>
                 <ul style="margin-left: 20px; color: #bdbdbd;">
                     <li>Konsistente Basis mit kontrollierten Variationen</li>
                     <li>Reproduzierbare Ergebnisse für A/B-Tests</li>
@@ -521,7 +521,7 @@ def main():
             </p>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Findet kreative Ideen für mein Konzept</strong>
+                <strong style="color: #ffffff;">03 | Findet kreative Ideen für mein Konzept</strong>
                 <ul style="margin-left: 20px; color: #bdbdbd;">
                     <li>Maximale kreative Freiheit für neue Ideen</li>
                     <li>Zufällige Ergebnisse für Inspiration</li>
@@ -547,7 +547,7 @@ def main():
             <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Workflow-Optionen</h4>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Bachtung deiner Vorgaben:</strong>
+                <strong style="color: #ffffff;">Bachtung meiner Vorgaben:</strong>
                 Steuert die Balance zwischen kreativer Freiheit und Prompt-Treue. Höhere Werte erzeugen Bilder, die enger an Ihrer Beschreibung bleiben, können aber weniger kreativ wirken.
             </p>
 
