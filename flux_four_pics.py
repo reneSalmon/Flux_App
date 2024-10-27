@@ -498,7 +498,7 @@ def main():
         # Add this markdown section after the seed_preset selectbox or in the expander section
         st.markdown("""
             <div style="color: #ffffff; background-color: #424242; padding: 15px; border-radius: 4px; border: 1px solid #616161;">
-            <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Ziele des Bildes - Voreinstellungen</h4>
+            <h4 style="color: #ffffff; margin-bottom: 10px; font-weight: 500;">Modus - Voreinstellungen</h4>
 
             <p style="color: #bdbdbd;">
                 <strong style="color: #ffffff;">Folge strikt meinem Konzept in höchster Qualität</strong>
@@ -552,7 +552,7 @@ def main():
             </p>
 
             <p style="color: #bdbdbd;">
-                <strong style="color: #ffffff;">Bildwiedergabe-Modi:</strong>
+                <strong style="color: #ffffff;">Bildwiedergabe Optionen:</strong>
                 Verschiedene Algorithmen für unterschiedliche Anwendungsfälle:
             </p>
             <ul style="margin-left: 20px; color: #bdbdbd;">
